@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brightside English</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f5f4f0; color: #111; }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 48px; background: #f5f4f0;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+      letter-spacing: -0.5px; color: #111;
+    }
+    .logo span { color: #F5C400; }
+    .logo sub { font-size: 9px; font-weight: 400; letter-spacing: 2px; color: #888; display: block; margin-top: -4px; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      font-size: 14px; color: #555; text-decoration: none; cursor: pointer; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #111; }
+    .nav-links a.active { color: #111; font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
+    .nav-btns { display: flex; gap: 10px; }
+    .btn-login {
+      background: #111; color: #fff; border: none;
+      padding: 10px 22px; border-radius: 999px;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-login:hover { opacity: 0.85; }
+    .btn-test {
+      background: #F5C400; color: #1a1200; border: none;
+      padding: 10px 22px; border-radius: 999px;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-test:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      min-height: 88vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 80px 40px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-letters {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-size: 220px; font-weight: 800;
+      color: rgba(0,0,0,0.04); letter-spacing: 30px;
+      pointer-events: none; user-select: none; line-height: 1;
+    }
+    .stars {
+      display: flex; align-items: center; gap: 4px;
+      margin-bottom: 24px; position: relative;
+    }
+    .star { color: #F5C400; font-size: 20px; }
+    .rating-text { font-size: 14px; color: #555; margin-left: 8px; }
+    .rating-text strong { color: #111; }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(40px, 6vw, 68px);
+      font-weight: 800; color: #111; line-height: 1.05;
+      max-width: 760px; margin-bottom: 24px;
+      letter-spacing: -2px; position: relative;
+    }
+    .hero p {
+      font-size: 17px; color: #666; max-width: 500px;
+      line-height: 1.7; margin-bottom: 40px; position: relative;
+    }
+    .hero-btns { display: flex; gap: 14px; position: relative; }
+    .btn-primary {
+      background: #F5C400; color: #1a1200; border: none;
+      padding: 16px 32px; border-radius: 999px;
+      font-size: 16px; font-weight: 500; cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .btn-primary:hover { transform: scale(1.03); opacity: 0.92; }
+    .btn-outline {
+      background: transparent; color: #111;
+      border: 1.5px solid #111; padding: 16px 32px;
+      border-radius: 999px; font-size: 16px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { background: #111; color: #fff; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex; justify-content: center; gap: 60px;
+      padding: 40px 48px; background: #111; color: #fff;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 32px;
+      font-weight: 800; color: #F5C400;
+    }
+    .stat-label { font-size: 13px; color: #aaa; margin-top: 4px; }
+
+    /* FEATURES */
+    .features {
+      padding: 80px 48px; background: #fff;
+    }
+    .section-label {
+      font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+      color: #888; margin-bottom: 12px; text-align: center;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800;
+      text-align: center; color: #111; margin-bottom: 48px; letter-spacing: -1px;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px; max-width: 900px; margin: 0 auto;
+    }
+    .feature-card {
+      background: #f5f4f0; border-radius: 16px;
+      padding: 28px 24px;
+    }
+    .feature-icon {
+      width: 44px; height: 44px; background: #F5C400;
+      border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-size: 20px; margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif; font-size: 16px;
+      font-weight: 700; color: #111; margin-bottom: 8px;
+    }
+    .feature-card p { font-size: 14px; color: #666; line-height: 1.6; }
+
+    /* COURSES */
+    .courses { padding: 80px 48px; background: #f5f4f0; }
+    .courses-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; max-width: 960px; margin: 0 auto;
+    }
+    .course-card {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .course-card:hover { transform: translateY(-4px); }
+    .course-thumb {
+      height: 140px; display: flex; align-items: center;
+      justify-content: center; font-size: 48px;
+    }
+    .course-body { padding: 20px; }
+    .course-tag {
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      color: #888; margin-bottom: 8px;
+    }
+    .course-body h3 {
+      font-family: 'Syne', sans-serif; font-size: 16px;
+      font-weight: 700; color: #111; margin-bottom: 8px;
+    }
+    .course-body p { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 16px; }
+    .course-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .price {
+      font-family: 'Syne', sans-serif; font-size: 18px;
+      font-weight: 800; color: #111;
+    }
+    .btn-enroll {
+      background: #F5C400; color: #1a1200; border: none;
+      padding: 8px 18px; border-radius: 999px;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #111; color: #fff;
+      padding: 40px 48px; text-align: center;
+    }
+    footer .logo { color: #fff; margin-bottom: 8px; display: block; }
+    footer p { font-size: 13px; color: #666; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">
+      BR<span>I</span>GHTSIDE
+      <sub>ENGLISH</sub>
+    </div>
+    <div class="nav-links">
+      <a class="active">Home</a>
+      <a>Courses</a>
+      <a>Flagship</a>
+      <a>Self Paced</a>
+      <a>E-Books ▾</a>
+      <a>About Us</a>
+      <a>Contact Us</a>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-login">Log In</button>
+      <button class="btn-test">Test Your English</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-letters">abcde</div>
+    <div class="stars">
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span class="star">★</span>
+      <span class="rating-text"><strong>4.9</strong> (1K+ reviews)</span>
+    </div>
+    <h1>Master English with Confidence one class at a time</h1>
+    <p>Learn faster with personalized 1-on-1 sessions, IELTS Speaking Mastery and practical lesson materials from our star team of tutors.</p>
+    <div class="hero-btns">
+      <button class="btn-primary">Explore All Courses →</button>
+      <button class="btn-outline">Book A Trial Class →</button>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-num">10K+</div>
+      <div class="stat-label">Students Enrolled</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4.9★</div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">50+</div>
+      <div class="stat-label">Expert Tutors</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">95%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <p class="section-label">Why Choose Us</p>
+    <h2 class="section-title">Learn the Brightside Way</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>1-on-1 Sessions</h3>
+        <p>Personalized classes tailored to your learning pace and goals.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>IELTS Mastery</h3>
+        <p>Targeted speaking and writing prep with proven strategies.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Self Paced</h3>
+        <p>Pre-recorded courses you can study anytime, anywhere.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📖</div>
+        <h3>E-Book Packs</h3>
+        <p>Downloadable resources to reinforce every lesson.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSES -->
+  <section class="courses">
+    <p class="section-label">Our Programs</p>
+    <h2 class="section-title">Popular Courses</h2>
+    <div class="courses-grid">
+      <div class="course-card">
+        <div class="course-thumb" style="background:#FFF8CC;">🗣️</div>
+        <div class="course-body">
+          <div class="course-tag">Flagship</div>
+          <h3>IELTS Speaking Mastery</h3>
+          <p>Ace your IELTS speaking test with expert coaching.</p>
+          <div class="course-footer">
+            <span class="price">₹4,999</span>
+            <button class="btn-enroll">Enroll →</button>
+          </div>
+        </div>
+      </div>
+      <div class="course-card">
+        <div class="course-thumb" style="background:#E8F5E9;">✍️</div>
+        <div class="course-body">
+          <div class="course-tag">Self Paced</div>
+          <h3>English Writing Essentials</h3>
+          <p>Master grammar, essays, and professional writing.</p>
+          <div class="course-footer">
+            <span class="price">₹2,499</span>
+            <button class="btn-enroll">Enroll →</button>
+          </div>
+        </div>
+      </div>
+      <div class="course-card">
+        <div class="course-thumb" style="background:#E3F2FD;">🎤</div>
+        <div class="course-body">
+          <div class="course-tag">Live</div>
+          <h3>Spoken English Bootcamp</h3>
+          <p>Build fluency and confidence in daily conversations.</p>
+          <div class="course-footer">
+            <span class="price">₹3,499</span>
+            <button class="btn-enroll">Enroll →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="logo">BR<span style="color:#F5C400">I</span>GHTSIDE ENGLISH</span>
+    <p>© 2025 Brightside English. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
