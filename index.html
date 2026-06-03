@@ -799,10 +799,9 @@ function buyNow(rpid, title) {
     image: 'https://brightsideenglish.com/favicon.png',
     // order_id: 'order_XXXXXX',        // Uncomment & set from your backend for production
     handler: function(response) {
-      // Payment successful — verify signature on your server before delivering the PDF
       console.log('payment_id:', response.razorpay_payment_id);
-      // Redirect to thank-you / delivery page:
-      window.location.href = 'https://brightsideenglish.com/thank-you?pid=' + response.razorpay_payment_id + '&book=' + encodeURIComponent(title);
+      // Show the details form instead of redirecting immediately
+      openLeadForm(response.razorpay_payment_id, title, amount);
     },
     prefill: {
       name: '',
@@ -832,8 +831,159 @@ function buyNow(rpid, title) {
   rzp.open();
 }
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── LEAD FORM MODAL ──────────────────────────────────────────────────────────
+var APPS_SCRIPT_URL = 'YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE';
+
+function openLeadForm(paymentId, bookTitle, amount) {
+  document.getElementById('lf-pid').value   = paymentId;
+  document.getElementById('lf-book').value  = bookTitle;
+  document.getElementById('lf-amt').value   = Math.round(amount / 100);
+  document.getElementById('lf-book-name').textContent = bookTitle;
+  document.getElementById('lf-amount-display').textContent = 'Rs ' + Math.round(amount / 100);
+  document.getElementById('lf-overlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLeadForm() {
+  document.getElementById('lf-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('lf-form');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('lf-btn');
+    var err = document.getElementById('lf-error');
+    err.style.display = 'none';
+
+    var name  = document.getElementById('lf-name').value.trim();
+    var phone = document.getElementById('lf-phone').value.trim();
+    var email = document.getElementById('lf-email').value.trim();
+
+    if (!name || !phone || !email) {
+      err.textContent = 'Please fill in all fields.';
+      err.style.display = 'block';
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      err.textContent = 'Enter a valid 10-digit Indian mobile number.';
+      err.style.display = 'block';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent = 'Enter a valid email address.';
+      err.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    var payload = {
+      name:      name,
+      phone:     phone,
+      email:     email,
+      paymentId: document.getElementById('lf-pid').value,
+      bookTitle: document.getElementById('lf-book').value,
+      amount:    document.getElementById('lf-amt').value
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function() {
+      // no-cors means we can't read the response, but if no error thrown it worked
+      closeLeadForm();
+      window.location.href = 'https://brightsideenglish.com/thank-you?pid=' + payload.paymentId + '&book=' + encodeURIComponent(payload.bookTitle);
+    })
+    .catch(function() {
+      // Even on network error, redirect so the buyer isn't stuck
+      closeLeadForm();
+      window.location.href = 'https://brightsideenglish.com/thank-you?pid=' + payload.paymentId + '&book=' + encodeURIComponent(payload.bookTitle);
+    });
+  });
+});
+// ─────────────────────────────────────────────────────────────────────────────
 </script>
 
+<!-- ── LEAD FORM MODAL ──────────────────────────────────────────────────── -->
+<div id="lf-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#111111;border-radius:16px;border:1px solid #2a2a2a;width:100%;max-width:440px;overflow:hidden;animation:fadeUp .3s ease;">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1a1400,#2c1f00);padding:20px 24px 16px;border-bottom:1px solid rgba(196,138,26,0.25);">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(196,138,26,0.15);border:0.5px solid rgba(196,138,26,0.35);border-radius:20px;padding:4px 12px;margin-bottom:10px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C48A1A" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span style="font-size:11px;font-weight:600;color:#E8AC38;letter-spacing:0.06em;">PAYMENT SUCCESSFUL</span>
+      </div>
+      <p style="font-size:20px;font-weight:600;color:#f5f5f5;margin:0 0 3px;font-family:var(--sf);">One last step</p>
+      <p style="font-size:13px;color:#888;margin:0;">Tell us where to send your playbook</p>
+      <div style="margin-top:12px;padding-top:12px;border-top:0.5px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:12px;color:#555;" id="lf-book-name"></span>
+        <span style="font-size:14px;font-weight:600;color:#C48A1A;" id="lf-amount-display"></span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div style="padding:20px 24px 24px;">
+      <form id="lf-form" novalidate>
+        <input type="hidden" id="lf-pid">
+        <input type="hidden" id="lf-book">
+        <input type="hidden" id="lf-amt">
+
+        <div style="display:flex;flex-direction:column;gap:13px;">
+
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:5px;letter-spacing:0.05em;">FULL NAME</label>
+            <div style="position:relative;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input id="lf-name" type="text" placeholder="e.g. Ravi Menon" autocomplete="name" style="width:100%;padding:11px 12px 11px 36px;font-size:14px;border-radius:8px;border:1px solid #2a2a2a;background:#181818;color:#f0f0f0;box-sizing:border-box;outline:none;font-family:var(--sn);" onfocus="this.style.borderColor='#C48A1A'" onblur="this.style.borderColor='#2a2a2a'">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:5px;letter-spacing:0.05em;">PHONE NUMBER</label>
+            <div style="display:flex;gap:8px;">
+              <div style="display:flex;align-items:center;gap:6px;padding:11px 12px;border-radius:8px;border:1px solid #2a2a2a;background:#181818;font-size:14px;color:#f0f0f0;white-space:nowrap;flex-shrink:0;">🇮🇳 +91</div>
+              <div style="position:relative;flex:1;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input id="lf-phone" type="tel" placeholder="98765 43210" maxlength="10" autocomplete="tel" style="width:100%;padding:11px 12px 11px 36px;font-size:14px;border-radius:8px;border:1px solid #2a2a2a;background:#181818;color:#f0f0f0;box-sizing:border-box;outline:none;font-family:var(--sn);" onfocus="this.style.borderColor='#C48A1A'" onblur="this.style.borderColor='#2a2a2a'">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:5px;letter-spacing:0.05em;">EMAIL ADDRESS</label>
+            <div style="position:relative;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input id="lf-email" type="email" placeholder="ravi@example.com" autocomplete="email" style="width:100%;padding:11px 12px 11px 36px;font-size:14px;border-radius:8px;border:1px solid #2a2a2a;background:#181818;color:#f0f0f0;box-sizing:border-box;outline:none;font-family:var(--sn);" onfocus="this.style.borderColor='#C48A1A'" onblur="this.style.borderColor='#2a2a2a'">
+            </div>
+          </div>
+
+          <div id="lf-error" style="display:none;font-size:12px;color:#ff6b6b;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2);border-radius:6px;padding:8px 12px;"></div>
+
+          <button id="lf-btn" type="submit" style="width:100%;padding:13px;background:#C48A1A;color:#0a0a0a;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sn);letter-spacing:0.02em;transition:background .2s;" onmouseover="this.style.background='#E8AC38'" onmouseout="this.style.background='#C48A1A'">
+            Save &amp; Get My Playbook &rarr;
+          </button>
+        </div>
+      </form>
+
+      <p style="font-size:11px;color:#444;text-align:center;margin:12px 0 0;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" style="vertical-align:-1px;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secured by Razorpay &middot; Your details stay private
+      </p>
+    </div>
+
+  </div>
+</div>
+<!-- ────────────────────────────────────────────────────────────────────────── -->
 
 </body>
 </html>
