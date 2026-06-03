@@ -790,9 +790,8 @@ function buyNow(rpid, title) {
   // For now we open directly with amount from PRICES map (server-side order_id recommended for production).
   var amount = PRICES[rpid] || 19900;
 
-  // ── Replace 'YOUR_KEY_ID' with your Razorpay Key ID (rzp_test_... or rzp_live_...) ──
   var options = {
-    key: 'YOUR_KEY_ID',
+    key: 'rzp_live_E0g8FoSt8t63NJ',
     amount: amount,                     // paise
     currency: 'INR',
     name: 'Brightside English',
