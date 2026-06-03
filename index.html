@@ -386,14 +386,7 @@ img{max-width:100%;display:block}button,a{font-family:var(--sn);cursor:pointer}a
 .fbar-btn:hover{background:var(--gdl)}
 @media(min-width:768px){.fbar{display:none !important}}
 
-/* PAYMENT MODAL */
-.pay-modal{position:fixed;inset:0;z-index:200;background:rgba(5,14,24,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px}
-.pay-modal.show{display:flex}
-.pay-inner{background:var(--wh);border-radius:var(--r3);padding:28px 24px;max-width:400px;width:100%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.pay-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--cr2);border:none;font-size:14px;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.pay-title{font-family:var(--sf);font-size:20px;font-weight:700;color:var(--dk);margin-bottom:16px;padding-right:20px}
-.pay-rzp{min-height:60px;display:flex;align-items:center;justify-content:center}
-.pay-rzp form{width:100%}
+
 
 /* SPEED: GPU layers for animations */
 .bkc:hover,.bc:hover,.fc:hover,.pc:hover,.tc:hover,.ti:hover{will-change:transform}
@@ -776,48 +769,40 @@ var title=v[4]||'Bundle';
 if(rpid){buyNow(rpid,title)}else{goTo('bundles')}
 }
 
+// Hidden container for Razorpay button scripts (never shown to user)
+var _rzpContainer = document.createElement('div');
+_rzpContainer.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:0;height:0;overflow:hidden;';
+document.body.appendChild(_rzpContainer);
+
 function buyNow(rpid, title) {
-  var m = document.getElementById('payModal');
-  if(!m) return;
-  document.getElementById('payTitle').textContent = title;
-  var rzp = document.getElementById('payRzp');
-  rzp.innerHTML = '<div style="padding:20px 0;color:var(--t3);font-size:13px">Loading checkout...</div>';
-  m.classList.add('show');
-  document.body.style.overflow = 'hidden';
-  setTimeout(function(){
-    var f = document.createElement('form');
-    var s = document.createElement('script');
-    s.src = 'https://checkout.razorpay.com/v1/payment-button.js';
-    s.setAttribute('data-payment_button_id', rpid);
-    s.async = true;
-    s.onerror = function(){
-      rzp.innerHTML = '<div style="padding:16px 0;text-align:center"><p style="font-size:13px;color:var(--t2);margin-bottom:12px">Checkout loading failed in preview.<br>On live site, Razorpay opens here.</p><a href="https://pages.razorpay.com/'+rpid+'" target="_blank" rel="noopener" style="display:inline-block;background:var(--gd);color:var(--dk);font-size:13px;font-weight:600;padding:12px 24px;border-radius:var(--r);text-decoration:none">Pay with Razorpay →</a></div>';
-    };
-    f.appendChild(s);
-    rzp.innerHTML = '';
-    rzp.appendChild(f);
-  }, 100);
+  // Clear previous script
+  _rzpContainer.innerHTML = '';
+  var f = document.createElement('form');
+  var s = document.createElement('script');
+  s.src = 'https://checkout.razorpay.com/v1/payment-button.js';
+  s.setAttribute('data-payment_button_id', rpid);
+  s.async = true;
+  s.onload = function() {
+    // Auto-click the Razorpay button once it renders
+    setTimeout(function() {
+      var btn = _rzpContainer.querySelector('button,input[type="button"],input[type="submit"],.razorpay-payment-button');
+      if (btn) {
+        btn.click();
+      } else {
+        // Fallback: open payment page directly
+        window.open('https://pages.razorpay.com/' + rpid, '_blank');
+      }
+    }, 400);
+  };
+  s.onerror = function() {
+    // Fallback if script fails to load
+    window.open('https://pages.razorpay.com/' + rpid, '_blank');
+  };
+  f.appendChild(s);
+  _rzpContainer.appendChild(f);
 }
-function closePayModal() {
-  var m = document.getElementById('payModal');
-  if(!m) return;
-  m.classList.remove('show');
-  document.getElementById('payRzp').innerHTML = '';
-  document.body.style.overflow = '';
-}
-var pm = document.getElementById('payModal');
-if(pm) pm.addEventListener('click', function(e) {
-  if (e.target === this) closePayModal();
-});
 </script>
 
-<!-- PAYMENT MODAL -->
-<div class="pay-modal" id="payModal">
-<div class="pay-inner">
-<button class="pay-close" onclick="closePayModal()">&times;</button>
-<div class="pay-title" id="payTitle"></div>
-<div class="pay-rzp" id="payRzp"></div>
-</div>
-</div>
+
 </body>
 </html>
