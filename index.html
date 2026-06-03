@@ -30,6 +30,7 @@
 <link rel="apple-touch-icon" href="https://brightsideenglish.com/apple-touch-icon.png">
 <link rel="dns-prefetch" href="https://checkout.razorpay.com">
 <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -769,9 +770,69 @@ var title=v[4]||'Bundle';
 if(rpid){buyNow(rpid,title)}else{goTo('bundles')}
 }
 
+// ─── RAZORPAY CHECKOUT.JS — MODAL (no redirect) ───────────────────────────
+// Prices keyed by Razorpay Payment Page ID
+var PRICES = {
+  // Individual books
+  'pl_Swh0WwBEw2FwRk':19900,'pl_Swh1B71kCtT8GH':14900,'pl_Swh1uBrtTPo41j':24900,
+  'pl_Swh2Y4pFlF5nuN':19900,'pl_Swh3GOX9IsAmT1':14900,'pl_SwhAgprUv57G6M':19900,
+  'pl_SwhBJS9vS6h6mc':19900,'pl_SwhHs1d8ti6Hmp':14900,'pl_SwhIZBZJe9VqpD':24900,
+  'pl_Swoh2h6hvPQaKR':24900,'pl_SwhNUftJMAD4yf':14900,'pl_SwhWYWn0EBn0OW':19900,
+  'pl_SwhYjyc5LyVniw':19900,'pl_SwheXmD5i8Fvie':29900,'pl_SwhhJ2xPuAJW2m':14900,
+  'pl_SwhiNib5GijgmZ':14900,'pl_Swhl2TtSeHKBOc':19900,'pl_SwhlfXCI3lUTzM':19900,
+  'pl_SwhpDwvtYSnEl0':19900,'pl_Swhps6yHs0zSFl':24900,
+  // Bundles — match your bundle rpid values in fsel options
+  'pl_SwhPromo1':49900,'pl_SwhPromo2':59900,'pl_SwhPromo3':79900,'pl_SwhPromo4':99900
+};
+
 function buyNow(rpid, title) {
-  window.location.href = 'https://pages.razorpay.com/' + rpid;
+  // Step 1: Create order via your backend, then open modal.
+  // For now we open directly with amount from PRICES map (server-side order_id recommended for production).
+  var amount = PRICES[rpid] || 19900;
+
+  // ── Replace 'YOUR_KEY_ID' with your Razorpay Key ID (rzp_test_... or rzp_live_...) ──
+  var options = {
+    key: 'YOUR_KEY_ID',
+    amount: amount,                     // paise
+    currency: 'INR',
+    name: 'Brightside English',
+    description: title,
+    image: 'https://brightsideenglish.com/favicon.png',
+    // order_id: 'order_XXXXXX',        // Uncomment & set from your backend for production
+    handler: function(response) {
+      // Payment successful — verify signature on your server before delivering the PDF
+      console.log('payment_id:', response.razorpay_payment_id);
+      // Redirect to thank-you / delivery page:
+      window.location.href = 'https://brightsideenglish.com/thank-you?pid=' + response.razorpay_payment_id + '&book=' + encodeURIComponent(title);
+    },
+    prefill: {
+      name: '',
+      email: '',
+      contact: ''
+    },
+    notes: {
+      product_id: rpid,
+      product_name: title
+    },
+    theme: {
+      color: '#C48A1A'          // matches your --gd gold
+    },
+    modal: {
+      ondismiss: function() {
+        // Modal closed without payment — no action needed
+      }
+    }
+  };
+
+  var rzp = new Razorpay(options);
+
+  rzp.on('payment.failed', function(response) {
+    alert('Payment failed: ' + response.error.description + '. Please try again.');
+  });
+
+  rzp.open();
 }
+// ─────────────────────────────────────────────────────────────────────────────
 </script>
 
 
