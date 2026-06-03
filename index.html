@@ -769,37 +769,8 @@ var title=v[4]||'Bundle';
 if(rpid){buyNow(rpid,title)}else{goTo('bundles')}
 }
 
-// Hidden container for Razorpay button scripts (never shown to user)
-var _rzpContainer = document.createElement('div');
-_rzpContainer.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:0;height:0;overflow:hidden;';
-document.body.appendChild(_rzpContainer);
-
 function buyNow(rpid, title) {
-  // Clear previous script
-  _rzpContainer.innerHTML = '';
-  var f = document.createElement('form');
-  var s = document.createElement('script');
-  s.src = 'https://checkout.razorpay.com/v1/payment-button.js';
-  s.setAttribute('data-payment_button_id', rpid);
-  s.async = true;
-  s.onload = function() {
-    // Auto-click the Razorpay button once it renders
-    setTimeout(function() {
-      var btn = _rzpContainer.querySelector('button,input[type="button"],input[type="submit"],.razorpay-payment-button');
-      if (btn) {
-        btn.click();
-      } else {
-        // Fallback: open payment page directly
-        window.open('https://pages.razorpay.com/' + rpid, '_blank');
-      }
-    }, 400);
-  };
-  s.onerror = function() {
-    // Fallback if script fails to load
-    window.open('https://pages.razorpay.com/' + rpid, '_blank');
-  };
-  f.appendChild(s);
-  _rzpContainer.appendChild(f);
+  window.location.href = 'https://pages.razorpay.com/' + rpid;
 }
 </script>
 
