@@ -246,7 +246,7 @@ img{max-width:100%;display:block}button,a{font-family:var(--sn);cursor:pointer}a
 .bkc{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 .bkc:hover{box-shadow:0 14px 48px rgba(5,14,24,.18);transform:translateY(-5px);border-color:var(--gdbr)}
 /* HIGH-END DESIGNER COVERS */
-.bkc-cv{aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:18px 14px}
+.bkc-cv{aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:18px 14px;flex-shrink:0}
 .bkc-cv::before{content:'';position:absolute;left:0;top:0;width:7px;height:100%;z-index:6;background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.15),rgba(255,255,255,.04))}
 .bkc-cv::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(170deg,rgba(255,255,255,.14) 0%,transparent 30%,transparent 70%,rgba(0,0,0,.4) 100%)}
 .cv-num{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--gd);color:var(--dk);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:7;box-shadow:0 2px 10px rgba(0,0,0,.35)}
@@ -707,7 +707,7 @@ var d=document.createElement('div');d.className='bkc rv';
 var nn=String(b.n).padStart(2,'0');
 var bn=bunMap[b.n]||'';
 var bnHtml=bn?'<div class="cv-bundle">'+bn+'</div>':'';
-var cvInner=b.cv?'<div class="bkc-cv" style="padding:0"><img src="'+b.cv+'" alt="'+b.t+'" style="width:100%;height:100%;object-fit:cover;display:block"></div>':'<div class="bkc-cv" style="background:linear-gradient(145deg,'+b.cl[0]+','+b.cl[1]+')"><div class="cv-num">'+nn+'</div><div class="cv-accent" style="background:'+b.cl[0]+'"></div><div class="cv-deco"></div><div class="cv-deco2" style="background:rgba(255,255,255,.15)"></div><div class="cv-deco3" style="background:rgba(255,255,255,.15)"></div><div class="cv-corner"></div><div class="cv-wrap"><div class="cv-mark">Brightside</div><div class="cv-ln"></div><div class="cv-title">'+b.t+'</div><div class="cv-ln"></div><div class="cv-by">Jonah Joy</div></div>'+bnHtml+'</div>';
+var cvInner=b.cv?'<div class="bkc-cv" style="padding:0;overflow:hidden"><img src="'+b.cv+'" alt="'+b.t+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"></div>':'<div class="bkc-cv" style="background:linear-gradient(145deg,'+b.cl[0]+','+b.cl[1]+')"><div class="cv-num">'+nn+'</div><div class="cv-accent" style="background:'+b.cl[0]+'"></div><div class="cv-deco"></div><div class="cv-deco2" style="background:rgba(255,255,255,.15)"></div><div class="cv-deco3" style="background:rgba(255,255,255,.15)"></div><div class="cv-corner"></div><div class="cv-wrap"><div class="cv-mark">Brightside</div><div class="cv-ln"></div><div class="cv-title">'+b.t+'</div><div class="cv-ln"></div><div class="cv-by">Jonah Joy</div></div>'+bnHtml+'</div>';
 d.innerHTML=cvInner+'<div class="bkc-info"><div class="bkc-aud">'+b.au+'</div><div class="bkc-t">'+b.t+'</div><div class="bkc-trig">'+b.tr+'</div><div class="bkc-ft"><div><div class="pr">Rs '+b.p+'</div><div class="pg">'+b.pg+'p · '+b.ch+'ch</div></div><button class="bkc-buy" onclick="buyNow(\''+b.rpid+'\',\''+b.t.replace(/\'/g,'')+'\')">Buy</button></div></div>';
 g.appendChild(d);
 });
@@ -792,7 +792,7 @@ function buyNow(rpid, title) {
   var amount = PRICES[rpid] || 19900;
 
   var options = {
-    key: 'rzp_test_Sq18uRGwcbA01w',
+    key: 'rzp_live_E0g8FoSt8t63NJ',
     amount: amount,                     // paise
     currency: 'INR',
     name: 'Brightside English',
@@ -834,7 +834,7 @@ function buyNow(rpid, title) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── LEAD FORM MODAL ──────────────────────────────────────────────────────────
-var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrd0wnAFRI2AQGa8ZdFWn8joJa0OykjnYgi46Yi9iwUzPuiNOe9KExJWMZQpiAglmQ/exec';
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLdARD1OSM6LXEihSQc0kOFUNNBUUHfzF2V-6Q1SviAmnCeuaQ_VOT1aZQNmjMMMc4/exec';
 
 function showThankYou(bookTitle) {
   document.getElementById('lf-form-wrap').style.display = 'none';
