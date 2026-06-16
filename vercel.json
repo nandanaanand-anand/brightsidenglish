@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/bookfirstclass/index.html",
+      "has": [
+        {
+          "type": "host",
+          "value": "bookfirstclass.brightsideenglish.com"
+        }
+      ]
+    }
+  ]
+}
